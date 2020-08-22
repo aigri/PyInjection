@@ -193,10 +193,10 @@ def injection():
     fd = open("{}_patched".format(file), "rb+")
 
     SHELLCODE_Y = open("{}".format(SHELLCODE_X), "rb+")
-
+    SHELLCODE = bytearray(SHELLCODE_Y)
+	
     start_code = hex(int(BASE_ADRESS) + int(pt_load_1_end, 16))
 	
-    SHELLCODE = bytearray(SHELLCODE_Y)
 
 
     if bits == 64:            
