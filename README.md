@@ -24,3 +24,14 @@ So if the address of the "LOAD" segments is changed at each execution it becomes
 
 ### Explanatory diagram
 <img src="https://static.packt-cdn.com/products/9781782167105/graphics/7105OS_04_5.jpg">
+
+##PoC
+Little Proof Of Concept of this script
+
+##Greetz
+
+Thanks to @nqntmqmqmb who helped me a lot
+
+
+
+
