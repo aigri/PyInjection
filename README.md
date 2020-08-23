@@ -19,3 +19,9 @@ Then you just have to add an instruction (like ``mov ebp, oep_addr; jmp ebp``)at
 
 ### Explanatory diagram
 <img src="https://static.packt-cdn.com/products/9781782167105/graphics/7105OS_04_5.jpg">
+
+## Why it should not be protected with PIE ?
+
+It shouldn't because PIE is used to randomize the addresses of the different segments and so on.
+So if the address of the "LOAD" segments is changed at each execution it becomes complicated to predict where the code can be injected.
+
