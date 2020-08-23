@@ -1,10 +1,21 @@
 # PyInjection
 
-ELF code injection
+Python script who inject code in binary (It should not be protected by PIE)
 
-## Explication
+## How does it work ?
 
-Celui-ci va chercher si le programme contient deux segments LOAD (qui ont pour flag RWX) pour pouvoir profiter de l'espace disponible entre ceux-ci pour y injecter notre code (qui pourra donc être executé vu le flag 'X' sur les segments). 
-Une fois le code injecté il suffit de changer le point d'entrée du programme (qui peut se trouver à l'adresse pointée par le membre e_entry du header ELF32) pour le situer à l'adresse de début de notre code et rajouter une instruction à la fin du code qui va jump sur notre point d'entrée initial. Il va de soi que l'executable doit être executé sans la protection de mémoire PIE qui va rendre aléatoire à chaque execution du programme les adresses des segments PT_LOAD ce qui va rendre notre injection impossible.
+### Searching for "LOAD" segments
+This will look for if the program contains two LOAD segments (which have the flag "RWX")
 
+### Injecting code
+Before we need to xor each registry in order to clean the stackframe
+Now we can take advantage of the free space between the two segments to inject our code that can be executed with the 'X' flag of the segments.
+
+### Patchint Entry Point
+Once the code has been injected, it is necessary to change the entrypoint and put it on the start address of the code so that the execution goes through it.
+
+### Jumping on OEP
+Then you just have to add an instruction (like ``mov ebp, oep_addr; jmp ebp``)at the end of the code to be injected which will take care of jumping on the old entry point (which can be located at the address pointed by the e_entry member in the ELF32 header) so that the program resumes the course of its execution.
+
+### Explanatory diagram
 <img src="https://static.packt-cdn.com/products/9781782167105/graphics/7105OS_04_5.jpg">
