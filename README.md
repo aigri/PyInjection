@@ -23,12 +23,12 @@ It shouldn't because PIE is used to randomize the addresses of the different seg
 So if the address of the "LOAD" segments is changed at each execution it becomes complicated to predict where the code can be injected.
 
 ### Explanatory diagram
-<img src="https://static.packt-cdn.com/products/9781782167105/graphics/7105OS_04_5.jpg">
+<img src="/src/a.jpeg">
 
 ## PoC
 Little Proof Of Concept of this script
 
-Soon
+<img src="/src/PoC.gif">
 
 ## Greetz
 
