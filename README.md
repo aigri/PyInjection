@@ -11,7 +11,7 @@ This will look for if the program contains two LOAD segments (which have the fla
 Before we need to xor each registry in order to clean the stackframe
 Now we can take advantage of the free space between the two segments to inject our code that can be executed with the 'X' flag of the segments.
 
-### Patchint Entry Point
+### Patching Entry Point
 Once the code has been injected, it is necessary to change the entrypoint and put it on the start address of the code so that the execution goes through it.
 
 ### Jumping on OEP
